@@ -1,30 +1,28 @@
-#include <TimerOne.h>
-long int CuentaPicos1=0; 
+#define PCINT_PIN1 A5
+#define PCINT_PIN2 A4
+long int CuentaPicos1=0;
 long int CuentaPicos2=0;
-void setup() {
- Timer1.initialize(1000000);         // Dispara cada 1s
- Timer1.attachInterrupt(ISR_Mostrar); // Activa la interrupcion y la asocia a ISR_Blink
-  Serial.begin(9600);
-  pinMode(8, INPUT);
-  pinMode(7, INPUT);
+#include <YetAnotherPcInt.h>
+#include <TimerOne.h>
+ 
+void pinChanged1(const char* message, bool pinstate) {
+  CuentaPicos1++;
+}
+ void pinChanged2(const char* message, bool pinstate) {
+  CuentaPicos2++;
 }
  
-void loop() {
-  
-
-  //Serial.println(digitalRead(8));
- if (digitalRead(8) == HIGH) {
-  if (digitalRead(8)== LOW){
-  CuentaPicos1++;
-  }
- }
- if (digitalRead(7) == HIGH) {
-  if (digitalRead(7)== LOW){
-  CuentaPicos2++;
-  }
- }
-  
+void setup() {
+  Timer1.initialize(1000000);         // Dispara cada 1s
+ Timer1.attachInterrupt(ISR_Mostrar); // Activa la interrupcion
+  Serial.begin(115200);
+  pinMode(PCINT_PIN1, INPUT_PULLUP);
+  pinMode(PCINT_PIN2, INPUT_PULLUP);
+  PcInt::attachInterrupt(PCINT_PIN1, pinChanged1, "Pin A5 has changed to ", CHANGE);
+  PcInt::attachInterrupt(PCINT_PIN2, pinChanged2, "Pin A5 has changed to ", CHANGE);
 }
+ 
+void loop() {}
 void ISR_Mostrar()
    {  
     Serial.print("encoder1:");
